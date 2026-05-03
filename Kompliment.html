@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Komplimenter">
+  <meta name="theme-color" content="#f8b4c8">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Komplimenter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+      color: #2d2d3a;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: max(env(safe-area-inset-top), 24px) 24px max(env(safe-area-inset-bottom), 24px);
+    }
+
+    h1 {
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.55;
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 8px;
+    }
+
+    #tekst {
+      font-size: clamp(1.6rem, 6vw, 2.4rem);
+      font-weight: 600;
+      line-height: 1.35;
+      text-align: center;
+      transition: opacity 250ms ease, transform 250ms ease;
+    }
+
+    #tekst.skifter {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      font: inherit;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #fff;
+      background: #2d2d3a;
+      padding: 18px 32px;
+      border-radius: 999px;
+      min-width: 240px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(45, 45, 58, 0.25);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+      box-shadow: 0 3px 10px rgba(45, 45, 58, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <h1>Til Lykke fra Nikolaj &#10084;</h1>
+
+  <main>
+    <p id="tekst"></p>
+  </main>
+
+  <button id="knap" type="button">Giv mig en kompliment</button>
+
+  <script>
+    const KOMPLIMENTER = [
+      // Generelt / hverdag
+      "Du gør hver dag bedre bare ved at være dig.",
+      "Dit smil smitter mere end du tror.",
+      "Med dig føles selv det mest almindelige som noget særligt.",
+      "Din latter er min yndlingslyd.",
+      "Du gør mig til en bedre version af mig selv.",
+      "Det er svært at forestille sig min dag uden dig.",
+      "Du er sjov på den helt rigtige måde.",
+      "Du gør selv dårlige dage til gode dage.",
+      "Du er den bedste del af min dag.",
+      "Du fortjener verden — og lidt mere til.",
+      "Selv din morgenstemme er charmerende.",
+      "Du er den slags menneske jeg håbede på at finde.",
+      "Du gør mig rolig bare ved at være i nærheden.",
+      "Du har så mange små talenter jeg stadig opdager.",
+      "Du er en gave jeg aldrig bliver vant til.",
+      "Du gør mig modig.",
+      "Du er rigtig god til at være dig selv.",
+      "Jeg elsker dig mere i dag end i går — og det betyder noget.",
+      "Du gør hjemmet til hjem.",
+      "Du er hverdag og fest på samme tid.",
+      "Du gør selv lange dage værd at komme hjem til.",
+      "Du er den jeg griner mest med.",
+      "Du er den jeg græder bedst hos.",
+      "Du er hjem for mig.",
+      "Du er min yndlings-alt.",
+      "Du er ikke til at undvære.",
+      "Du gør mit liv større.",
+
+      // Omsorg og hjerte
+      "Du har et hjerte der er større end de fleste.",
+      "Din omsorg for andre er noget af det smukkeste ved dig.",
+      "Du har en måde at få folk til at føle sig set på.",
+      "Du er den varmeste person jeg kender.",
+      "Måden du behandler dyr på siger alt om dit hjerte.",
+      "Du har en helt særlig blødhed når der er et dyr i nærheden.",
+      "Du gør verden lidt mere blid for alt levende omkring dig.",
+      "Din omsorg er ikke bare noget du gør — det er den du er.",
+      "Du elsker så stort at det fylder hele rummet.",
+      "Du ser de dyr de fleste går forbi.",
+      "Dit hjerte har plads til både mig, Balder og alt det andet du holder af.",
+      "Du tager dig af andre på en måde der gør mig stolt.",
+      "Du har den slags omsorg man kan bygge et liv på.",
+      "Du tør være sårbar — det er den modigste form for styrke.",
+      "Du gør plads til både mig, Balder og dig selv — det er ikke alle der kan det.",
+
+      // Hilsner fra Balder
+      "Balder elsker dig over alt på jorden.",
+      "Balder ville løbe gennem ild for dig — det vil jeg også.",
+      "Hilsen fra Balder: du er hans yndlingsmenneske.",
+      "Balder logrer hver gang du kigger på ham — og jeg gør det samme indeni.",
+      "Balder synes du er den bedste, og han har god smag.",
+      "Balder savner dig hvert sekund du er væk. Det gør jeg også.",
+      "Når du klør Balder bag øret, er han det lykkeligste væsen i verden.",
+      "Balder ville sige det selv hvis han kunne: du er hans favorit.",
+      "Balder har valgt dig — og han vælger ikke hvem som helst.",
+      "Du er Balders ro, og min også.",
+      "Balder vågner glad hver morgen fordi du er der.",
+      "Balder smiler med hele kroppen når du kommer hjem.",
+      "Balder ved hvem der er hans menneske — og det er dig.",
+      "Hvis Balder kunne tale, ville han bruge alle sine ord på dig.",
+
+      // Intelligens
+      "Jeg elsker hvordan du tænker.",
+      "Du er klogere end du selv giver dig kredit for.",
+      "Din nysgerrighed er smittende.",
+      "Du tænker dybere end de fleste indser.",
+      "Det du siger får mig tit til at se ting på en ny måde.",
+      "Du er klog på en måde der ikke skal bevises.",
+      "Din hjerne er mindst lige så smuk som resten af dig.",
+      "Jeg elsker at høre dig forklare ting du brænder for.",
+      "Du har en lynhurtig forståelse for mennesker.",
+      "Du stiller de spørgsmål andre ikke har tænkt over.",
+      "Du ser sammenhænge jeg overser.",
+      "Din intuition er næsten urimeligt præcis.",
+      "Du er den klogeste person jeg deler hverdag med.",
+      "Du gør mig klogere bare ved at tale med mig.",
+      "Du har en helt egen måde at tænke på — og den er fantastisk.",
+      "Du er stærk på måder du ikke selv lægger mærke til.",
+
+      // Smuk
+      "Du er smukkere end du selv kan se.",
+      "Du har et helt specielt blik når du er glad.",
+      "Du er den smukkeste hver eneste dag.",
+      "Jeg taber stadig pusten når du kommer ind ad døren.",
+      "Du har et ansigt jeg aldrig bliver træt af at kigge på.",
+      "Du er smuk når du er nybadet, og smuk når du lige er stået op.",
+      "Du har øjne man kan blive væk i.",
+      "Dit hår klæder dig uanset hvordan det sidder.",
+      "Du er smukkest når du griner uden at tænke over det.",
+      "Selv din rynkepande er sød.",
+      "Du er smuk på en måde der ikke kan beskrives med ord.",
+      "Du har det smukkeste smil jeg kender.",
+      "Når du sover ser du ud som et kunstværk.",
+      "Du gør altid det smukke smukkere bare ved at være der.",
+      "Jeg kunne kigge på dig i timevis.",
+
+      // Lækker
+      "Du er ulovligt lækker.",
+      "Du har den slags udstråling der vender hoveder.",
+      "Du er lige så lækker i joggingbukser som i alt andet.",
+      "Du er en af de få mennesker der bare bliver lækrere med tiden.",
+      "Hver gang jeg ser dig, tænker jeg at jeg er heldig.",
+      "Du har en krop jeg aldrig bliver træt af.",
+      "Du er en hel pakke — og den er svimlende.",
+      "Du dufter altid godt — også når du ikke selv tror det.",
+      "Du har den slags blik der får mig til at glemme hvad jeg ville sige.",
+      "Du er fysisk uimodståelig for mig.",
+      "Du er stadig den mest sexede person i ethvert rum.",
+
+      // Soveværelse-hygge
+      "Jeg tænker oftere på dig end jeg bør indrømme.",
+      "Du gør det svært at koncentrere mig om noget som helst.",
+      "Bare det at høre din stemme tænder mig.",
+      "Jeg glæder mig altid til når vi er alene igen.",
+      "Du har en helt urimelig effekt på mig.",
+      "Jeg vil hellere blive i sengen med dig end alt andet.",
+      "Du gør det svært at stå op om morgenen — men på den gode måde.",
+      "Hver gang du kysser mig, glemmer jeg alt andet.",
+      "Jeg elsker hvordan du føles helt tæt på.",
+      "Du har en måde at røre ved mig på der får mig til at smelte.",
+      "Det at vågne ved siden af dig er det bedste i verden.",
+      "Jeg tænker ofte på i går aftes.",
+      "Du er min yndlingsperson at gå tidligt i seng med.",
+      "Bare et blik fra dig kan ændre hele min aften.",
+      "Jeg vil hellere have dig end nogen drøm.",
+      "Du er den slags varme jeg vil tilbage til hver eneste aften.",
+      "Jeg savner din hud når den ikke er ved min.",
+      "Du gør det svært at tænke på andet end dig.",
+      "Jeg elsker den måde du ser på mig på når vi er alene.",
+
+      // Karakter / dybere
+      "Du er stædig på alle de rigtige måder.",
+      "Du har en helt egen humor jeg er forelsket i.",
+      "Du er trofast helt ind til knoglen.",
+      "Du er den jeg helst vil dele alting med.",
+      "Du gør de små ting til noget særligt.",
+      "Du er let at elske, og umulig at lade være med at elske.",
+      "Du tager livet alvorligt på de rigtige måder, og let på de andre.",
+      "Du har den slags ro andre længes efter.",
+      "Du er min foretrukne historie at høre igen.",
+      "Du er den bedste partner jeg kunne ønske mig.",
+      "Du er den jeg vil vågne ved i mange år endnu.",
+      "Du er den jeg leder efter når der er godt nyt — og dårligt.",
+      "Du er den jeg er gladest sammen med.",
+      "Jeg er stolt af alt det du er."
+    ];
+
+    const tekst = document.getElementById('tekst');
+    const knap = document.getElementById('knap');
+    let sidsteIndeks = -1;
+
+    function vaelgIndeks() {
+      if (KOMPLIMENTER.length <= 1) return 0;
+      let i;
+      do { i = Math.floor(Math.random() * KOMPLIMENTER.length); }
+      while (i === sidsteIndeks);
+      return i;
+    }
+
+    function visKompliment(animer) {
+      const i = vaelgIndeks();
+      sidsteIndeks = i;
+
+      if (animer) {
+        tekst.classList.add('skifter');
+        setTimeout(() => {
+          tekst.textContent = KOMPLIMENTER[i];
+          tekst.classList.remove('skifter');
+        }, 200);
+      } else {
+        tekst.textContent = KOMPLIMENTER[i];
+      }
+    }
+
+    knap.addEventListener('click', () => visKompliment(true));
+    visKompliment(false);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
