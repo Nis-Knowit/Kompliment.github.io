@@ -1,4 +1,4 @@
-const CACHE = 'komplimenter-v3';
+const CACHE = 'komplimenter-v4';
 
 // Kritiske filer der skal pre-caches ved install (skal alle lykkes)
 const CRITICAL = [

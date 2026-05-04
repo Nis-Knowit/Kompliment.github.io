@@ -38,11 +38,14 @@ Efter et par minutter er siden live på URL'en ovenfor.
 
 ## Features
 
-- **Komplimenter**: tryk på knappen — få en tilfældig kompliment med svævende hjerter
-- **Balder-tilstand**: paw-ikonet i hjørnet filtrerer til Balder-komplimenter og viser et tilfældigt billede af ham
-- **Lykke-tilstand**: hjerte-ikonet viser et tilfældigt billede af jer to sammen
-- **Kupon-chance**: ~4% chance per tryk for at få en kupon i stedet for en kompliment
-- **Indløs-knap**: når en kupon vises, kan den sendes direkte via Messenger (eller hvilken som helst messaging-app) via en delknap. Indløste kuponer kommer ikke igen før alle er brugt.
+Hver gang knappen trykkes, ruller app'en en terning:
+
+- **76% normal kompliment** med svævende hjerter
+- **10% Balder-overraskelse** &mdash; bronzefarvet baggrund, billede af Balder, og sm&aring; pote-aftryk der svaever op
+- **10% Lykke-overraskelse** &mdash; rosa baggrund, billede af jer to, og ekstra hjerter
+- **4% kupon** &mdash; styled som et kupon-kort. Tryk **"Indl&oslash;s"** for at sende kuponen direkte via Messenger (eller hvilken som helst messaging-app via Web Share API). Indl&oslash;ste kuponer kommer ikke igen f&oslash;r alle er brugt.
+
+Sandsynlighederne kan justeres &oslash;verst i `<script>`-blokken: `KUPON_CHANCE`, `BALDER_CHANCE`, `LYKKE_CHANCE`.
 
 ## Tilføj flere komplimenter eller kuponer
 
