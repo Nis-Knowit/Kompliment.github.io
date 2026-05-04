@@ -39,8 +39,10 @@ Efter et par minutter er siden live på URL'en ovenfor.
 ## Features
 
 - **Komplimenter**: tryk på knappen — få en tilfældig kompliment med svævende hjerter
-- **Balder-tilstand**: tryk på paw-ikonet i hjørnet — filtrerer til kun Balder-komplimenter og viser hans billede
-- **Kupon-chance**: ~8% chance per tryk for at få en kupon i stedet for en kompliment (kan indløses i virkeligheden)
+- **Balder-tilstand**: paw-ikonet i hjørnet filtrerer til Balder-komplimenter og viser et tilfældigt billede af ham
+- **Lykke-tilstand**: hjerte-ikonet viser et tilfældigt billede af jer to sammen
+- **Kupon-chance**: ~4% chance per tryk for at få en kupon i stedet for en kompliment
+- **Indløs-knap**: når en kupon vises, kan den sendes direkte via Messenger (eller hvilken som helst messaging-app) via en delknap. Indløste kuponer kommer ikke igen før alle er brugt.
 
 ## Tilføj flere komplimenter eller kuponer
 
@@ -48,18 +50,15 @@ Rediger `KOMPLIMENTER`- eller `KUPONER`-arrayet i `Kompliment.html`. Commit og p
 
 Bump også `CACHE`-konstanten i `sw.js` (fx `komplimenter-v3`) når du laver ændringer, så de gamle filer ikke serveres fra cache.
 
-## Tilføj rigtige billeder af Balder
+## Tilføj eller udskift billeder
 
-1. Læg JPG/PNG-billeder i `balder/`-mappen, fx `balder/01.jpg`, `balder/02.jpg`, ...
-2. Tilføj filnavnene til `BALDER_BILLEDER`-arrayet i `Kompliment.html`:
-   ```js
-   const BALDER_BILLEDER = [
-     'balder/01.jpg',
-     'balder/02.jpg',
-     'balder/03.jpg'
-   ];
+1. Smid nye billeder (HEIC, JPG, PNG) i `balder/` eller `lykke/`
+2. Kør konverteringsscriptet:
    ```
-3. Tilføj de samme stier til `ASSETS`-arrayet i `sw.js` så de cacher offline.
-4. Bump `CACHE`-versionen og push.
+   py scripts/convert_photos.py
+   ```
+   Det laver web-optimerede `-web.jpg`-versioner ved siden af originalerne (resized til max 1200px, ~80% kvalitet).
+3. Tilføj de nye `-web.jpg`-stier til `BALDER_BILLEDER` eller `LYKKE_BILLEDER` i `Kompliment.html`.
+4. Bump `CACHE`-konstanten i `sw.js` (fx `komplimenter-v4`) og push.
 
-Et tilfældigt billede vælges hver gang Balder-tilstanden tændes.
+Originalerne er ekskluderet via `.gitignore` — kun de optimerede `-web.jpg`-versioner pushes til repoet.

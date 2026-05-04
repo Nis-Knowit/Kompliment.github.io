@@ -4,3 +4,33 @@
 *.user
 Thumbs.db
 .DS_Store
+
+# Originale billeder/videoer — kun de web-optimerede -web.jpg pushes
+balder/*.HEIC
+balder/*.heic
+balder/*.JPG
+balder/*.jpeg
+balder/*.JPEG
+balder/*.png
+balder/*.PNG
+balder/*.MP4
+balder/*.mp4
+balder/*.MOV
+balder/*.mov
+lykke/*.HEIC
+lykke/*.heic
+lykke/*.JPG
+lykke/*.jpeg
+lykke/*.JPEG
+lykke/*.png
+lykke/*.PNG
+lykke/*.MP4
+lykke/*.mp4
+lykke/*.MOV
+lykke/*.mov
+
+# Ekskludér også .jpg, men tag de optimerede versioner med
+balder/*.jpg
+lykke/*.jpg
+!balder/*-web.jpg
+!lykke/*-web.jpg

@@ -34,9 +34,8 @@
       position: relative;
     }
 
-    body.balder-mode {
-      background: linear-gradient(135deg, #f5deb3 0%, #c19a6b 100%);
-    }
+    body.balder-mode { background: linear-gradient(135deg, #f5deb3 0%, #c19a6b 100%); }
+    body.lykke-mode  { background: linear-gradient(135deg, #ffd1dc 0%, #e89bb0 100%); }
 
     h1 {
       font-size: 1rem;
@@ -57,19 +56,19 @@
       padding: 24px 8px;
     }
 
-    #balderBillede {
+    #foto {
       width: 160px;
       height: 160px;
       border-radius: 50%;
       object-fit: cover;
       margin: 0 0 24px 0;
-      border: 4px solid rgba(255,255,255,0.75);
+      border: 4px solid rgba(255,255,255,0.78);
       box-shadow: 0 6px 20px rgba(45, 45, 58, 0.2);
       animation: dukOp 400ms ease-out;
     }
 
     @keyframes dukOp {
-      from { opacity: 0; transform: scale(0.8); }
+      from { opacity: 0; transform: scale(0.85); }
       to   { opacity: 1; transform: scale(1); }
     }
 
@@ -99,6 +98,7 @@
       position: relative;
       box-shadow: 0 10px 30px rgba(45, 45, 58, 0.18);
       max-width: 460px;
+      margin: 0 auto;
     }
 
     #indhold.kupon::before {
@@ -117,7 +117,7 @@
     }
 
     #indhold.kupon::after {
-      content: "Indløses i virkeligheden";
+      content: "Tryk på \"Indløs\" for at sende den til Nis";
       position: absolute;
       bottom: -12px;
       left: 50%;
@@ -129,6 +129,7 @@
       font-size: 0.7rem;
       font-weight: 600;
       border: 1px solid #c19a6b;
+      white-space: nowrap;
     }
 
     #indhold.kupon #tekst {
@@ -137,7 +138,15 @@
       color: #5a3e1f;
     }
 
-    /* Knapper */
+    /* Bund-knapper */
+    .knapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+    }
+
     button {
       appearance: none;
       border: none;
@@ -151,7 +160,7 @@
       min-width: 240px;
       cursor: pointer;
       box-shadow: 0 6px 20px rgba(45, 45, 58, 0.25);
-      transition: transform 120ms ease, box-shadow 120ms ease;
+      transition: transform 120ms ease, box-shadow 120ms ease, background 200ms ease;
     }
 
     button:active {
@@ -159,11 +168,22 @@
       box-shadow: 0 3px 10px rgba(45, 45, 58, 0.25);
     }
 
-    /* Balder toggle */
-    .balder-toggle {
+    #indlosKnap {
+      background: #c19a6b;
+      box-shadow: 0 6px 20px rgba(193, 154, 107, 0.45);
+    }
+
+    /* Mode-toggles */
+    .toggles {
       position: fixed;
       top: max(env(safe-area-inset-top), 16px);
       right: 16px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .toggle {
       width: 48px;
       height: 48px;
       min-width: 0;
@@ -177,15 +197,12 @@
       box-shadow: 0 3px 10px rgba(45,45,58,0.15);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
-      z-index: 10;
     }
 
-    .balder-toggle.active {
-      background: #c19a6b;
-      color: #fff;
-    }
+    .toggle.active.balder { background: #c19a6b; color: #fff; }
+    .toggle.active.lykke  { background: #e89bb0; color: #fff; }
 
-    .balder-toggle svg { width: 26px; height: 26px; }
+    .toggle svg { width: 26px; height: 26px; }
 
     /* Svævende hjerter */
     .heart {
@@ -202,29 +219,67 @@
       100% { opacity: 0;
              transform: translate(calc(-50% + var(--dx)), calc(-260px + var(--dy))) scale(1.3) rotate(var(--rot)); }
     }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: max(env(safe-area-inset-bottom), 110px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(45, 45, 58, 0.95);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      z-index: 1000;
+      animation: toastIn 280ms ease-out, toastOut 320ms ease-in 2.5s forwards;
+      pointer-events: none;
+      max-width: calc(100vw - 48px);
+      text-align: center;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 16px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to   { opacity: 0; transform: translate(-50%, -8px); }
+    }
   </style>
 </head>
 <body>
-  <button id="balderToggle" class="balder-toggle" type="button" aria-label="Balder-tilstand" title="Balder-tilstand">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <ellipse cx="12" cy="16" rx="5" ry="4"/>
-      <ellipse cx="6" cy="10" rx="2" ry="2.5"/>
-      <ellipse cx="9.5" cy="7" rx="1.7" ry="2.2"/>
-      <ellipse cx="14.5" cy="7" rx="1.7" ry="2.2"/>
-      <ellipse cx="18" cy="10" rx="2" ry="2.5"/>
-    </svg>
-  </button>
+  <div class="toggles">
+    <button id="lykkeToggle" class="toggle lykke" type="button" aria-label="Lykke og Nis-tilstand" title="Lykke og Nis">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 21s-7.5-4.5-9.5-9.5C1.2 8.3 3.4 5 6.7 5c1.9 0 3.4 1 4.3 2.3l1 1.4 1-1.4C13.9 6 15.4 5 17.3 5c3.3 0 5.5 3.3 4.2 6.5C19.5 16.5 12 21 12 21z"/>
+      </svg>
+    </button>
+    <button id="balderToggle" class="toggle balder" type="button" aria-label="Balder-tilstand" title="Balder">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <ellipse cx="12" cy="16" rx="5" ry="4"/>
+        <ellipse cx="6" cy="10" rx="2" ry="2.5"/>
+        <ellipse cx="9.5" cy="7" rx="1.7" ry="2.2"/>
+        <ellipse cx="14.5" cy="7" rx="1.7" ry="2.2"/>
+        <ellipse cx="18" cy="10" rx="2" ry="2.5"/>
+      </svg>
+    </button>
+  </div>
 
   <h1>Til dig &#10084;</h1>
 
   <main>
-    <img id="balderBillede" alt="Balder" hidden>
+    <img id="foto" alt="" hidden>
     <div id="indhold">
       <p id="tekst"></p>
     </div>
   </main>
 
-  <button id="knap" type="button">Giv mig en kompliment</button>
+  <div class="knapper">
+    <button id="indlosKnap" type="button" hidden>Indl&oslash;s &#128140;</button>
+    <button id="knap" type="button">Giv mig en kompliment</button>
+  </div>
 
   <script>
     const KOMPLIMENTER = [
@@ -401,23 +456,100 @@
       "Du vælger næste serie — jeg klager ikke."
     ];
 
-    // Tilføj filnavne her når du har billeder af Balder, fx 'balder/01.jpg'.
-    // Hvis listen er tom (eller filerne mangler), bruges placeholder.
     const BALDER_BILLEDER = [
-      'balder/placeholder.svg'
+      "balder/IMG_2705-web.jpg",
+      "balder/IMG_2862-web.jpg",
+      "balder/IMG_3020-web.jpg",
+      "balder/IMG_3092-web.jpg",
+      "balder/IMG_3138-web.jpg",
+      "balder/IMG_3152-web.jpg",
+      "balder/IMG_3154-web.jpg",
+      "balder/IMG_3177-web.jpg",
+      "balder/IMG_3315-web.jpg",
+      "balder/IMG_3458-web.jpg",
+      "balder/IMG_3706-web.jpg",
+      "balder/PXL_20240712_153202133-web.jpg",
+      "balder/PXL_20240717_102602613-web.jpg",
+      "balder/PXL_20240729_163847843-web.jpg",
+      "balder/PXL_20240813_155754204.PORTRAIT-web.jpg",
+      "balder/PXL_20240825_072608991.PORTRAIT~2-web.jpg",
+      "balder/PXL_20240907_072410737.PORTRAIT~2-web.jpg",
+      "balder/PXL_20240923_141331016.MP-web.jpg",
+      "balder/PXL_20241006_161329759~2-web.jpg",
+      "balder/PXL_20241027_091038208-web.jpg",
+      "balder/PXL_20241224_091550753-web.jpg",
+      "balder/PXL_20250322_063233832.PORTRAIT-web.jpg",
+      "balder/PXL_20250322_063517645.PORTRAIT-web.jpg"
     ];
 
-    const KUPON_CHANCE = 0.08; // 8% chance per tryk
+    const LYKKE_BILLEDER = [
+      "lykke/20250829_152536-web.jpg",
+      "lykke/20251018_110539-web.jpg",
+      "lykke/20260116_212031-web.jpg",
+      "lykke/IMG_0931-web.jpg",
+      "lykke/IMG_1123-web.jpg",
+      "lykke/IMG_1337-web.jpg",
+      "lykke/IMG_1707-web.jpg",
+      "lykke/IMG_20220220_215138-web.jpg",
+      "lykke/IMG_3534-web.jpg",
+      "lykke/IMG_7032-web.jpg",
+      "lykke/Messenger_creation_411CF212-195F-4B36-8F25-4AB03A773174-web.jpg",
+      "lykke/Messenger_creation_EDBB0863-553E-4D80-8D5A-B9D946B52731-web.jpg",
+      "lykke/PXL_20230717_113634182.PORTRAIT~2-web.jpg",
+      "lykke/PXL_20230717_132756368.PORTRAIT-web.jpg",
+      "lykke/PXL_20230815_174444961.MP-web.jpg",
+      "lykke/PXL_20241019_185226117.PORTRAIT-web.jpg",
+      "lykke/PXL_20241231_143511833.PORTRAIT-web.jpg",
+      "lykke/PXL_20250405_182406965.PORTRAIT-web.jpg"
+    ];
+
+    const KUPON_CHANCE = 0.04; // 4% chance per tryk
+    const REDEEMED_KEY = "komplimenter_redeemed_v1";
 
     const tekst = document.getElementById('tekst');
     const indhold = document.getElementById('indhold');
     const knap = document.getElementById('knap');
+    const indlosKnap = document.getElementById('indlosKnap');
     const balderToggle = document.getElementById('balderToggle');
-    const balderBillede = document.getElementById('balderBillede');
+    const lykkeToggle = document.getElementById('lykkeToggle');
+    const foto = document.getElementById('foto');
 
     let sidsteIndeks = -1;
-    let balderMode = false;
+    let mode = 'default'; // 'default' | 'balder' | 'lykke'
+    let aktivKupon = null; // sat når en kupon vises
     const BALDER_LISTE = KOMPLIMENTER.filter(c => c.includes('Balder'));
+
+    /* ---------- Indløste kuponer (localStorage) ---------- */
+
+    function getIndloste() {
+      try { return JSON.parse(localStorage.getItem(REDEEMED_KEY) || '[]'); }
+      catch { return []; }
+    }
+
+    function gemIndloste(liste) {
+      try { localStorage.setItem(REDEEMED_KEY, JSON.stringify(liste)); }
+      catch {}
+    }
+
+    function tilgaengeligeKuponer() {
+      const indloste = getIndloste();
+      const ledige = KUPONER.filter(k => !indloste.includes(k));
+      if (ledige.length === 0) {
+        gemIndloste([]);
+        return KUPONER.slice();
+      }
+      return ledige;
+    }
+
+    function markerIndlost(kupon) {
+      const liste = getIndloste();
+      if (!liste.includes(kupon)) {
+        liste.push(kupon);
+        gemIndloste(liste);
+      }
+    }
+
+    /* ---------- Visning ---------- */
 
     function vaelgIndeks(liste) {
       if (liste.length <= 1) return 0;
@@ -427,19 +559,23 @@
       return i;
     }
 
-    function aktivListe() {
-      return balderMode ? BALDER_LISTE : KOMPLIMENTER;
+    function aktivKomplimentliste() {
+      return mode === 'balder' ? BALDER_LISTE : KOMPLIMENTER;
     }
 
     function visKompliment(animer) {
-      const erKupon = !balderMode && Math.random() < KUPON_CHANCE;
-      const liste = erKupon ? KUPONER : aktivListe();
+      // Kuponer kan kun komme i default-mode
+      const kuponPulje = mode === 'default' ? tilgaengeligeKuponer() : [];
+      const erKupon = kuponPulje.length > 0 && Math.random() < KUPON_CHANCE;
+      const liste = erKupon ? kuponPulje : aktivKomplimentliste();
       const i = vaelgIndeks(liste);
       sidsteIndeks = i;
 
       const opdater = () => {
         indhold.classList.toggle('kupon', erKupon);
         tekst.textContent = liste[i];
+        aktivKupon = erKupon ? liste[i] : null;
+        indlosKnap.hidden = !erKupon;
       };
 
       if (animer) {
@@ -452,6 +588,8 @@
         opdater();
       }
     }
+
+    /* ---------- Hjerter ---------- */
 
     function spawnHearts(centerX, topY) {
       const count = 4 + Math.floor(Math.random() * 4);
@@ -475,11 +613,80 @@
       }
     }
 
-    function vaelgBalderBillede() {
-      if (!BALDER_BILLEDER.length) return;
-      const idx = Math.floor(Math.random() * BALDER_BILLEDER.length);
-      balderBillede.src = BALDER_BILLEDER[idx];
+    /* ---------- Toast ---------- */
+
+    function visToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3100);
     }
+
+    /* ---------- Foto-tilstande ---------- */
+
+    function vaelgFoto(liste) {
+      if (!liste.length) return null;
+      return liste[Math.floor(Math.random() * liste.length)];
+    }
+
+    function setMode(nyMode) {
+      mode = (mode === nyMode) ? 'default' : nyMode;
+
+      document.body.classList.toggle('balder-mode', mode === 'balder');
+      document.body.classList.toggle('lykke-mode',  mode === 'lykke');
+      balderToggle.classList.toggle('active', mode === 'balder');
+      lykkeToggle.classList.toggle('active',  mode === 'lykke');
+
+      if (mode === 'balder') {
+        const src = vaelgFoto(BALDER_BILLEDER);
+        if (src) { foto.src = src; foto.hidden = false; }
+      } else if (mode === 'lykke') {
+        const src = vaelgFoto(LYKKE_BILLEDER);
+        if (src) { foto.src = src; foto.hidden = false; }
+      } else {
+        foto.hidden = true;
+        foto.removeAttribute('src');
+      }
+
+      sidsteIndeks = -1;
+      visKompliment(true);
+    }
+
+    /* ---------- Indløsning ---------- */
+
+    async function indlosKupon() {
+      if (!aktivKupon) return;
+      const tekst = aktivKupon;
+      const besked = `🎟️ Jeg vil gerne indløse min kupon: "${tekst}" 💛`;
+
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: 'Kupon-indløsning',
+            text: besked
+          });
+          markerIndlost(tekst);
+          visToast('Indløst! Beskeden er sendt 💛');
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(besked);
+          markerIndlost(tekst);
+          visToast('Kopieret — indsæt i Messenger 💛');
+        } else {
+          visToast('Kunne ikke dele — tag et screenshot i stedet');
+        }
+        // Skift til ny kompliment efter et kort øjeblik
+        setTimeout(() => {
+          aktivKupon = null;
+          indlosKnap.hidden = true;
+          visKompliment(true);
+        }, 1200);
+      } catch (e) {
+        // Bruger annullerede share-dialogen — gør intet
+      }
+    }
+
+    /* ---------- Event handlers ---------- */
 
     knap.addEventListener('click', () => {
       const r = knap.getBoundingClientRect();
@@ -487,21 +694,11 @@
       visKompliment(true);
     });
 
-    balderToggle.addEventListener('click', () => {
-      balderMode = !balderMode;
-      balderToggle.classList.toggle('active', balderMode);
-      document.body.classList.toggle('balder-mode', balderMode);
-      sidsteIndeks = -1;
+    indlosKnap.addEventListener('click', indlosKupon);
+    balderToggle.addEventListener('click', () => setMode('balder'));
+    lykkeToggle.addEventListener('click',  () => setMode('lykke'));
 
-      if (balderMode) {
-        vaelgBalderBillede();
-        balderBillede.hidden = false;
-      } else {
-        balderBillede.hidden = true;
-      }
-
-      visKompliment(true);
-    });
+    /* ---------- Init ---------- */
 
     visKompliment(false);
 
