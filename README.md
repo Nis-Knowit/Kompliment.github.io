@@ -6,7 +6,7 @@ Lille PWA der viser tilfældige komplimenter. Kører helt i browseren — ingen 
 
 Når GitHub Pages er aktiveret:
 
-**https://nis-knowit.github.io/Kompliment-App/Kompliment.html**
+**https://nis-knowit.github.io/Kompliment.github.io/Kompliment.html**
 
 ## Aktivér GitHub Pages (engangsopsætning)
 
