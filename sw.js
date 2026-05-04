@@ -1,9 +1,10 @@
-const CACHE = 'komplimenter-v1';
+const CACHE = 'komplimenter-v2';
 const ASSETS = [
   './',
   './Kompliment.html',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon.svg',
+  './balder/placeholder.svg'
 ];
 
 self.addEventListener('install', (event) => {

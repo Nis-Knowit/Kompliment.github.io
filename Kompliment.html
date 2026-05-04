@@ -22,6 +22,7 @@
       overflow: hidden;
       -webkit-user-select: none;
       user-select: none;
+      transition: background 600ms ease;
     }
 
     body {
@@ -30,6 +31,11 @@
       align-items: center;
       justify-content: space-between;
       padding: max(env(safe-area-inset-top), 24px) 24px max(env(safe-area-inset-bottom), 24px);
+      position: relative;
+    }
+
+    body.balder-mode {
+      background: linear-gradient(135deg, #f5deb3 0%, #c19a6b 100%);
     }
 
     h1 {
@@ -45,9 +51,36 @@
       width: 100%;
       max-width: 540px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px 8px;
+    }
+
+    #balderBillede {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 0 24px 0;
+      border: 4px solid rgba(255,255,255,0.75);
+      box-shadow: 0 6px 20px rgba(45, 45, 58, 0.2);
+      animation: dukOp 400ms ease-out;
+    }
+
+    @keyframes dukOp {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    #indhold {
+      width: 100%;
+      transition: opacity 250ms ease, transform 250ms ease;
+    }
+
+    #indhold.skifter {
+      opacity: 0;
+      transform: translateY(8px);
     }
 
     #tekst {
@@ -55,14 +88,56 @@
       font-weight: 600;
       line-height: 1.35;
       text-align: center;
-      transition: opacity 250ms ease, transform 250ms ease;
     }
 
-    #tekst.skifter {
-      opacity: 0;
-      transform: translateY(8px);
+    /* Kupon-styling */
+    #indhold.kupon {
+      background: #fffaf0;
+      border: 3px dashed #c19a6b;
+      border-radius: 18px;
+      padding: 40px 24px 36px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(45, 45, 58, 0.18);
+      max-width: 460px;
     }
 
+    #indhold.kupon::before {
+      content: "KUPON";
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #c19a6b;
+      color: #fff;
+      padding: 5px 16px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+    }
+
+    #indhold.kupon::after {
+      content: "Indløses i virkeligheden";
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fffaf0;
+      color: #c19a6b;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 1px solid #c19a6b;
+    }
+
+    #indhold.kupon #tekst {
+      font-style: italic;
+      font-size: clamp(1.4rem, 5.5vw, 2rem);
+      color: #5a3e1f;
+    }
+
+    /* Knapper */
     button {
       appearance: none;
       border: none;
@@ -83,13 +158,70 @@
       transform: scale(0.97);
       box-shadow: 0 3px 10px rgba(45, 45, 58, 0.25);
     }
+
+    /* Balder toggle */
+    .balder-toggle {
+      position: fixed;
+      top: max(env(safe-area-inset-top), 16px);
+      right: 16px;
+      width: 48px;
+      height: 48px;
+      min-width: 0;
+      padding: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.55);
+      color: #2d2d3a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(45,45,58,0.15);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 10;
+    }
+
+    .balder-toggle.active {
+      background: #c19a6b;
+      color: #fff;
+    }
+
+    .balder-toggle svg { width: 26px; height: 26px; }
+
+    /* Svævende hjerter */
+    .heart {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+      animation: floatUp 1.6s ease-out forwards;
+      will-change: transform, opacity;
+    }
+
+    @keyframes floatUp {
+      0%   { opacity: 0; transform: translate(-50%, 0) scale(0.4) rotate(0deg); }
+      15%  { opacity: 1; }
+      100% { opacity: 0;
+             transform: translate(calc(-50% + var(--dx)), calc(-260px + var(--dy))) scale(1.3) rotate(var(--rot)); }
+    }
   </style>
 </head>
 <body>
-  <h1>Til Lykke fra Nikolaj &#10084;</h1>
+  <button id="balderToggle" class="balder-toggle" type="button" aria-label="Balder-tilstand" title="Balder-tilstand">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <ellipse cx="12" cy="16" rx="5" ry="4"/>
+      <ellipse cx="6" cy="10" rx="2" ry="2.5"/>
+      <ellipse cx="9.5" cy="7" rx="1.7" ry="2.2"/>
+      <ellipse cx="14.5" cy="7" rx="1.7" ry="2.2"/>
+      <ellipse cx="18" cy="10" rx="2" ry="2.5"/>
+    </svg>
+  </button>
+
+  <h1>Til dig &#10084;</h1>
 
   <main>
-    <p id="tekst"></p>
+    <img id="balderBillede" alt="Balder" hidden>
+    <div id="indhold">
+      <p id="tekst"></p>
+    </div>
   </main>
 
   <button id="knap" type="button">Giv mig en kompliment</button>
@@ -244,34 +376,133 @@
       "Jeg er stolt af alt det du er."
     ];
 
-    const tekst = document.getElementById('tekst');
-    const knap = document.getElementById('knap');
-    let sidsteIndeks = -1;
+    const KUPONER = [
+      "Én massage uden modkrav.",
+      "Jeg laver din yndlingsret i aften.",
+      "Én aften hvor du bestemmer alt.",
+      "30 minutter krammer uden afbrydelser.",
+      "Jeg går med Balder i morgen — sov længe.",
+      "Én dato-aften planlagt af mig.",
+      "Dit yndlings-take-away — jeg betaler.",
+      "En lang film-aften under tæppet.",
+      "En weekend hvor jeg overtager det praktiske.",
+      "Morgenmad på sengen i morgen.",
+      "En skovtur med Balder — du vælger ruten.",
+      "Én spontan biltur — du vælger destination.",
+      "Én lang bad-tid for dig alene.",
+      "Jeg holder dig hele natten.",
+      "En aften med din yndlings-vin og lidt for meget chokolade.",
+      "Jeg ordner al opvask en hel uge.",
+      "Én bagesession sammen — du vælger hvad.",
+      "En eftermiddag uden telefoner — kun os.",
+      "Én lang krammer uden grund.",
+      "Et knus og en kop kaffe i sengen.",
+      "Én ekstra dyne-tid søndag morgen.",
+      "Du vælger næste serie — jeg klager ikke."
+    ];
 
-    function vaelgIndeks() {
-      if (KOMPLIMENTER.length <= 1) return 0;
+    // Tilføj filnavne her når du har billeder af Balder, fx 'balder/01.jpg'.
+    // Hvis listen er tom (eller filerne mangler), bruges placeholder.
+    const BALDER_BILLEDER = [
+      'balder/placeholder.svg'
+    ];
+
+    const KUPON_CHANCE = 0.08; // 8% chance per tryk
+
+    const tekst = document.getElementById('tekst');
+    const indhold = document.getElementById('indhold');
+    const knap = document.getElementById('knap');
+    const balderToggle = document.getElementById('balderToggle');
+    const balderBillede = document.getElementById('balderBillede');
+
+    let sidsteIndeks = -1;
+    let balderMode = false;
+    const BALDER_LISTE = KOMPLIMENTER.filter(c => c.includes('Balder'));
+
+    function vaelgIndeks(liste) {
+      if (liste.length <= 1) return 0;
       let i;
-      do { i = Math.floor(Math.random() * KOMPLIMENTER.length); }
+      do { i = Math.floor(Math.random() * liste.length); }
       while (i === sidsteIndeks);
       return i;
     }
 
+    function aktivListe() {
+      return balderMode ? BALDER_LISTE : KOMPLIMENTER;
+    }
+
     function visKompliment(animer) {
-      const i = vaelgIndeks();
+      const erKupon = !balderMode && Math.random() < KUPON_CHANCE;
+      const liste = erKupon ? KUPONER : aktivListe();
+      const i = vaelgIndeks(liste);
       sidsteIndeks = i;
 
+      const opdater = () => {
+        indhold.classList.toggle('kupon', erKupon);
+        tekst.textContent = liste[i];
+      };
+
       if (animer) {
-        tekst.classList.add('skifter');
+        indhold.classList.add('skifter');
         setTimeout(() => {
-          tekst.textContent = KOMPLIMENTER[i];
-          tekst.classList.remove('skifter');
-        }, 200);
+          opdater();
+          indhold.classList.remove('skifter');
+        }, 220);
       } else {
-        tekst.textContent = KOMPLIMENTER[i];
+        opdater();
       }
     }
 
-    knap.addEventListener('click', () => visKompliment(true));
+    function spawnHearts(centerX, topY) {
+      const count = 4 + Math.floor(Math.random() * 4);
+      const symboler = ['❤', '\u{1F495}', '\u{1F496}', '\u{1F497}'];
+      const farver = ['#ff6b9d', '#e94560', '#ffb3c1', '#ff8da1', '#ffffff'];
+
+      for (let i = 0; i < count; i++) {
+        const h = document.createElement('span');
+        h.className = 'heart';
+        h.textContent = symboler[Math.floor(Math.random() * symboler.length)];
+        h.style.left = centerX + 'px';
+        h.style.top = topY + 'px';
+        h.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
+        h.style.setProperty('--dy', (Math.random() * 60 - 30) + 'px');
+        h.style.setProperty('--rot', (Math.random() * 80 - 40) + 'deg');
+        h.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
+        h.style.color = farver[Math.floor(Math.random() * farver.length)];
+        h.style.animationDelay = (Math.random() * 120) + 'ms';
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1900);
+      }
+    }
+
+    function vaelgBalderBillede() {
+      if (!BALDER_BILLEDER.length) return;
+      const idx = Math.floor(Math.random() * BALDER_BILLEDER.length);
+      balderBillede.src = BALDER_BILLEDER[idx];
+    }
+
+    knap.addEventListener('click', () => {
+      const r = knap.getBoundingClientRect();
+      spawnHearts(r.left + r.width / 2, r.top);
+      visKompliment(true);
+    });
+
+    balderToggle.addEventListener('click', () => {
+      balderMode = !balderMode;
+      balderToggle.classList.toggle('active', balderMode);
+      document.body.classList.toggle('balder-mode', balderMode);
+      sidsteIndeks = -1;
+
+      if (balderMode) {
+        vaelgBalderBillede();
+        balderBillede.hidden = false;
+      } else {
+        balderBillede.hidden = true;
+      }
+
+      visKompliment(true);
+    });
+
     visKompliment(false);
 
     if ('serviceWorker' in navigator) {
